@@ -1,0 +1,73 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/digital_twins/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id        String           @id @default(cuid())
+  name      String
+  sex       String
+  birthYear Int
+  birthDate DateTime?
+  createdAt DateTime         @default(now())
+  records   ClinicalRecord[]
+}
+
+model ClinicalRecord {
+  id                    String    @id @default(cuid())
+  patientId             String
+  year                  Int
+  visitDate             DateTime?
+  heightCm              Float
+  weightKg              Float
+  diseaseCodes          String[]
+  notes                 String?
+  waistCm               Float?
+  systolicBp            Float?
+  diastolicBp           Float?
+  triglyceridesMgDl     Float?
+  hdlMgDl               Float?
+  ldlMgDl               Float?
+  totalCholesterolMgDl  Float?
+  fastingGlucoseMgDl    Float?
+  isOnAntihypertensive  Boolean?  @default(false)
+  isOnAntidiabetic      Boolean?  @default(false)
+  isOnLipidLowering     Boolean?  @default(false)
+  physicalActivityLevel String?
+  smokingStatus         String?
+  auditScore            Int?
+  bdiScore              Int?
+  astUL                 Float?
+  altUL                 Float?
+  ggtUL                 Float?
+  bmi                   Float?
+  hasMetabolicSyndrome  Boolean?
+  metabolicRiskScore    Float?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  patient               Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, year])
+  @@index([patientId, year])
+}
+
+model PredictionLog {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+  patientId     String
+  recordId      String
+  modelVersion  String
+  inputFeatures Json
+  prediction    Float
+  userId        String?
+  context       String
+
+  @@index([patientId, timestamp])
+  @@index([modelVersion])
+}

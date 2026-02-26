@@ -1,0 +1,57 @@
+{
+  "morphTargets": {
+    "Weight": {
+      "index": 0,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "AbdomenGirth": {
+      "index": 1,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "MuscleMass": {
+      "index": 2,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "Posture": {
+      "index": 3,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "DiabetesEffect": {
+      "index": 4,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "HypertensionEffect": {
+      "index": 5,
+      "range": [
+        0,
+        1
+      ]
+    },
+    "HeartDiseaseEffect": {
+      "index": 6,
+      "range": [
+        0,
+        1
+      ]
+    }
+  },
+  "vertexCount": 11556,
+  "faceCount": 23040,
+  "height": 1.75,
+  "generator": "create_simple_avatar.py"
+}

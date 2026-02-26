@@ -1,0 +1,28 @@
+# Node / Next.js
+node_modules
+.next
+out
+dist
+*.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Prisma SQLite
+**/*.db
+**/*.db-journal
+
+# Python caches / venv
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Dados grandes / temporários (ajuste se quiser versionar)
+Uploads/
+ml_data/
