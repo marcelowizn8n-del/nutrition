@@ -1,0 +1,363 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  NUTRITIONIST
+  PATIENT
+}
+
+enum ModelJobStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+enum NutritionPlanStatus {
+  DRAFT
+  ACTIVE
+  SIGNED
+  ARCHIVED
+}
+
+enum AlertStatus {
+  PENDING
+  SENT
+  DISMISSED
+}
+
+enum AlertPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum AlertChannel {
+  IN_APP
+  EMAIL
+  PUSH
+}
+
+enum DietGoal {
+  LOSE_FAT
+  GAIN_MUSCLE
+  RECOMPOSITION
+  MAINTENANCE
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  patients Patient[]
+  apiKeys  ApiKey[]
+  usages   ApiUsageDaily[]
+}
+
+model ApiKey {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name            String
+  key             String    @unique
+  active          Boolean   @default(true)
+  rateLimitPerMin Int?
+  createdAt       DateTime  @default(now())
+  lastUsedAt      DateTime?
+
+  @@index([organizationId, active])
+}
+
+model ApiUsageDaily {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  date            DateTime
+  totalCalls      Int      @default(0)
+  callsByEndpoint Json
+
+  @@unique([organizationId, date])
+  @@index([organizationId, date])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  role         UserRole
+  passwordHash String
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  signedPlans NutritionPlan[] @relation("SignedBy")
+
+  @@index([organizationId, role])
+}
+
+model Patient {
+  id        String    @id @default(cuid())
+  name      String
+  sex       String
+  birthYear Int
+  birthDate DateTime?
+  createdAt DateTime  @default(now())
+
+  organizationId String       @default("org_default")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  records     ClinicalRecord[]
+  models3d    BodyModel3D[]
+  plans       NutritionPlan[]
+  alerts      Alert[]
+  progress    ProgressLog[]
+  simulations BodySimulation[]
+
+  @@index([organizationId, createdAt])
+}
+
+model ClinicalRecord {
+  id                   String    @id @default(cuid())
+  patientId            String
+  year                 Int
+  visitDate            DateTime?
+  heightCm             Float
+  weightKg             Float
+  diseaseCodes         String
+  notes                String?
+  waistCm              Float?
+  systolicBp           Float?
+  diastolicBp          Float?
+  triglyceridesMgDl    Float?
+  hdlMgDl              Float?
+  ldlMgDl              Float?
+  totalCholesterolMgDl Float?
+  fastingGlucoseMgDl   Float?
+  isOnAntihypertensive Boolean?  @default(false)
+  isOnAntidiabetic     Boolean?  @default(false)
+  isOnLipidLowering    Boolean?  @default(false)
+
+  bioImpedanceFat          Float?
+  bioImpedanceMuscle       Float?
+  bioImpedanceWater        Float?
+  bioImpedanceVisceral     Float?
+  bioImpedanceBone         Float?
+  bioImpedanceMetabolicAge Int?
+
+  physicalActivityLevel String?
+  smokingStatus         String?
+  auditScore            Int?
+  bdiScore              Int?
+  astUL                 Float?
+  altUL                 Float?
+  ggtUL                 Float?
+  bmi                   Float?
+  hasMetabolicSyndrome  Boolean?
+  metabolicRiskScore    Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  models3d BodyModel3D[]
+  plans    NutritionPlan[]
+
+  @@unique([patientId, year])
+  @@index([patientId, year])
+}
+
+model PredictionLog {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+  patientId     String
+  recordId      String
+  modelVersion  String
+  inputFeatures Json
+  prediction    Float
+  userId        String?
+  context       String
+
+  @@index([patientId, timestamp])
+  @@index([modelVersion])
+}
+
+model BodyModel3D {
+  id               String @id @default(cuid())
+  patientId        String
+  clinicalRecordId String
+
+  providerJobId String
+  status        ModelJobStatus @default(QUEUED)
+  modelUrl      String?
+  landmarksJson Json?
+  photoUrls     Json
+
+  generatedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinicalRecord ClinicalRecord @relation(fields: [clinicalRecordId], references: [id], onDelete: Cascade)
+
+  simulations BodySimulation[]
+
+  @@index([patientId, createdAt])
+  @@index([clinicalRecordId])
+  @@index([status])
+}
+
+model BodySimulation {
+  id        String @id @default(cuid())
+  patientId String
+  modelId   String
+
+  scenariosJson Json
+  horizonWeeks  Int
+  createdAt     DateTime @default(now())
+
+  patient Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  model   BodyModel3D @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, createdAt])
+  @@index([modelId])
+}
+
+model NutritionPlan {
+  id               String @id @default(cuid())
+  patientId        String
+  clinicalRecordId String
+
+  version Int                 @default(1)
+  status  NutritionPlanStatus @default(DRAFT)
+
+  goal      DietGoal
+  dietStyle String
+  region    String
+
+  caloricTarget  Float
+  macrosJson     Json
+  planJson       Json
+  alertsJson     Json?
+  simulationJson Json?
+
+  signedAt               DateTime?
+  signedByNutritionistId String?
+  signedBy               User?     @relation("SignedBy", fields: [signedByNutritionistId], references: [id], onDelete: SetNull)
+  signatureHash          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient        Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinicalRecord ClinicalRecord @relation(fields: [clinicalRecordId], references: [id], onDelete: Cascade)
+
+  menus        WeeklyMenu[]
+  alerts       Alert[]
+  progressLogs ProgressLog[]
+  recipes      RecipeSuggestion[]
+
+  @@index([patientId, createdAt])
+  @@index([clinicalRecordId])
+  @@index([status])
+}
+
+model WeeklyMenu {
+  id     String @id @default(cuid())
+  planId String
+
+  weekIndex Int
+  focus     String
+
+  menuJson          Json
+  shoppingListJson  Json
+  substitutionsJson Json
+
+  plan NutritionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, weekIndex])
+  @@index([planId])
+}
+
+model Alert {
+  id        String @id @default(cuid())
+  patientId String
+  planId    String
+
+  category     String
+  message      String
+  trigger      String
+  scheduledFor DateTime
+  channel      AlertChannel
+  status       AlertStatus   @default(PENDING)
+  priority     AlertPriority @default(MEDIUM)
+
+  patient Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  plan    NutritionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, scheduledFor])
+  @@index([planId])
+  @@index([status])
+}
+
+model ProgressLog {
+  id        String @id @default(cuid())
+  patientId String
+  planId    String
+
+  logDate          DateTime
+  weightKg         Float?
+  waistCm          Float?
+  adherencePercent Float?
+  moodScore        Int?
+  notes            String?
+
+  patient Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  plan    NutritionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([patientId, logDate])
+  @@index([planId])
+}
+
+model RecipeSuggestion {
+  id     String @id @default(cuid())
+  planId String
+
+  name            String
+  region          String
+  mealType        MealType
+  ingredientsJson Json
+  macrosJson      Json
+  preparationText String
+  imageUrl        String?
+  createdAt       DateTime @default(now())
+
+  plan NutritionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@index([planId, createdAt])
+  @@index([region, mealType])
+}
