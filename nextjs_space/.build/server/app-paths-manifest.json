@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/predict-metabolic-risk/route": "app/api/predict-metabolic-risk/route.js",
+  "/api/simulate-intervention/route": "app/api/simulate-intervention/route.js",
+  "/entrar/page": "app/entrar/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/visualizador/page": "app/visualizador/page.js",
+  "/page": "app/page.js",
+  "/api/patient/[id]/route": "app/api/patient/[id]/route.js",
+  "/api/patients/route": "app/api/patients/route.js",
+  "/api/logout/route": "app/api/logout/route.js",
+  "/api/calculate-body-params/route": "app/api/calculate-body-params/route.js",
+  "/api/me/route": "app/api/me/route.js",
+  "/medico/page": "app/medico/page.js",
+  "/paciente/page": "app/paciente/page.js",
+  "/nutricionista/page": "app/nutricionista/page.js"
+}

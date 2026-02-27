@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { prisma } from '../../../../lib/db';
-import { AUTH_COOKIE_NAME, verifyAuthToken } from '../../../../lib/auth';
+import { prisma } from '@/lib/db';
+import { AUTH_COOKIE_NAME, verifyAuthToken } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 

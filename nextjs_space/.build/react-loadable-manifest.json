@@ -1,0 +1,14 @@
+{
+  "components/viewer-loader.tsx -> ./three-viewer": {
+    "id": 43832,
+    "files": [
+      "static/chunks/b536a0f1.ce3134825372e102.js",
+      "static/chunks/982.941c00d00e7ba4ec.js",
+      "static/chunks/832.6e923a306d7b6f80.js"
+    ]
+  },
+  "node_modules/@react-three/drei/core/FaceLandmarker.js -> @mediapipe/tasks-vision": {
+    "id": null,
+    "files": []
+  }
+}
