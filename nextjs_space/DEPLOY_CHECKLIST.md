@@ -1,4 +1,4 @@
-# ✅ DTNutrition - Checklist de Deploy
+# ✅ Nutrition - Checklist de Deploy
 
 ## 📋 Pré-Deploy
 
@@ -35,7 +35,7 @@
 - [ ] Arquivos estáticos copiados
 
 ### PM2
-- [ ] Diretórios de log criados (`/home/ubuntu/logs/dtnutrition/`)
+- [ ] Diretórios de log criados (`/home/ubuntu/logs/nutrition/`)
 - [ ] Aplicação iniciada com PM2
 - [ ] Status mostra "online"
 - [ ] `pm2 save` executado
@@ -93,7 +93,7 @@
 - [ ] Verificar se há novas variáveis de ambiente
 - [ ] Verificar se há migrações pendentes
 - [ ] `./deploy.sh` executado
-- [ ] `pm2 restart dtnutrition`
+- [ ] `pm2 restart nutrition`
 - [ ] Testar funcionalidades principais
 
 ---

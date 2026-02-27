@@ -9,15 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
-  title: 'Digital Twins - Hospital Albert Einstein',
-  description: 'Sistema de visualização 3D de gêmeos digitais para acompanhamento clínico de pacientes',
+  title: 'Nutrition - Sistema de Nutrição e Visualização 3D',
+  description: 'Sistema de nutrição, acompanhamento clínico e visualização 3D de pacientes',
   icons: {
     icon: '/favicon.png',
     shortcut: '/favicon.png',
   },
   openGraph: {
-    title: 'Digital Twins - Hospital Albert Einstein',
-    description: 'Sistema de visualização 3D de gêmeos digitais para acompanhamento clínico de pacientes',
+    title: 'Nutrition - Sistema de Nutrição e Visualização 3D',
+    description: 'Sistema de nutrição, acompanhamento clínico e visualização 3D de pacientes',
     images: ['/og-image.png'],
   },
 };

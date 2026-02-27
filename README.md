@@ -1,8 +1,8 @@
-# Digital Twins - Sistema de Visualização 3D de Pacientes
+# Nutrition - Sistema de Visualização 3D de Pacientes
 
 ## 📋 Visão Geral
 
-O **Digital Twins** é um sistema de visualização médica que cria representações 3D de pacientes (gêmeos digitais) para acompanhamento clínico. O sistema permite que profissionais de saúde visualizem a evolução corporal de pacientes ao longo do tempo, considerando fatores como peso, altura, idade e condições clínicas.
+O **Nutrition** é um sistema de visualização médica que cria representações 3D de pacientes (gêmeos digitais) para acompanhamento clínico. O sistema permite que profissionais de saúde visualizem a evolução corporal de pacientes ao longo do tempo, considerando fatores como peso, altura, idade e condições clínicas.
 
 ## 🎯 Finalidade
 
@@ -35,7 +35,7 @@ Criar uma representação visual 3D que reflete o estado de saúde do paciente, 
 ### Estrutura do Projeto
 
 ```
-digital_twins/
+nutrition/
 ├── nextjs_space/
 │   ├── app/
 │   │   ├── api/
@@ -182,7 +182,7 @@ model ClinicalRecord {
 ### Desenvolvimento Local
 
 ```bash
-cd digital_twins/nextjs_space
+cd nutrition/nextjs_space
 
 # Instalar dependências
 yarn install
@@ -226,4 +226,4 @@ O sistema está deployado em: **https://digitaltwin.abacusai.app**
 
 ---
 
-*Este documento faz parte do projeto Digital Twins para visualização médica 3D.*
+*Este documento faz parte do projeto Nutrition para visualização médica 3D.*

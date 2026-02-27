@@ -1,6 +1,6 @@
 /**
  * PM2 Ecosystem Configuration
- * DTNutrition - Sistema de Visualização 3D de Pacientes
+ * Nutrition - Sistema de Nutrição e Visualização 3D
  * 
  * Uso:
  *   pm2 start ecosystem.config.js
@@ -10,13 +10,13 @@
 module.exports = {
   apps: [
     {
-      name: 'dtnutrition',
+      name: 'nutrition',
       
       // Script de entrada (standalone server do Next.js)
       script: '.next/standalone/server.js',
       
       // Diretório de trabalho
-      cwd: '/home/ubuntu/workspace/dtnutrition/nextjs_space',
+      cwd: '/home/ubuntu/workspace/nutrition/nextjs_space',
       
       // Variáveis de ambiente
       env: {
@@ -46,9 +46,9 @@ module.exports = {
       max_memory_restart: '1G',
       
       // Logs
-      log_file: '/home/ubuntu/logs/dtnutrition/combined.log',
-      out_file: '/home/ubuntu/logs/dtnutrition/out.log',
-      error_file: '/home/ubuntu/logs/dtnutrition/error.log',
+      log_file: '/home/ubuntu/logs/nutrition/combined.log',
+      out_file: '/home/ubuntu/logs/nutrition/out.log',
+      error_file: '/home/ubuntu/logs/nutrition/error.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       
       // Merge logs de diferentes instâncias

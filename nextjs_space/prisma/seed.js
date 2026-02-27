@@ -45,7 +45,7 @@ async function main() {
   // 4) ApiKey inicial para testes
   const rawKey =
     process.env.SEED_API_KEY ||
-    'dtnutrition_test_' + randomBytes(16).toString('hex');
+    'nutrition_test_' + randomBytes(16).toString('hex');
 
   const apiKey = await prisma.apiKey.upsert({
     where: { key: rawKey },

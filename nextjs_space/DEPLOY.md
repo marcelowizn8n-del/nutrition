@@ -1,6 +1,6 @@
-# 🚀 DTNutrition - Guia de Deploy
+# 🚀 Nutrition - Guia de Deploy
 
-Este guia explica como fazer o deploy do DTNutrition em uma VPS com Ubuntu.
+Este guia explica como fazer o deploy do Nutrition em uma VPS com Ubuntu.
 
 ## 📋 Pré-requisitos
 
@@ -31,9 +31,9 @@ sudo apt install nginx
 sudo -u postgres psql
 
 # Criar usuário e banco
-CREATE USER dtnutrition_user WITH PASSWORD 'SUA_SENHA_SEGURA';
-CREATE DATABASE dtnutrition_prod OWNER dtnutrition_user;
-GRANT ALL PRIVILEGES ON DATABASE dtnutrition_prod TO dtnutrition_user;
+CREATE USER nutrition_user WITH PASSWORD 'SUA_SENHA_SEGURA';
+CREATE DATABASE nutrition_prod OWNER nutrition_user;
+GRANT ALL PRIVILEGES ON DATABASE nutrition_prod TO nutrition_user;
 \q
 ```
 
@@ -42,10 +42,10 @@ GRANT ALL PRIVILEGES ON DATABASE dtnutrition_prod TO dtnutrition_user;
 ```
 /home/ubuntu/
 ├── workspace/
-│   └── dtnutrition/
+│   └── nutrition/
 │       └── nextjs_space/     # Código da aplicação
 └── logs/
-    └── dtnutrition/          # Logs do PM2
+    └── nutrition/          # Logs do PM2
 ```
 
 ## 🔧 Passo a Passo do Deploy
@@ -54,8 +54,8 @@ GRANT ALL PRIVILEGES ON DATABASE dtnutrition_prod TO dtnutrition_user;
 
 ```bash
 cd /home/ubuntu/workspace
-git clone https://seu-repo.git dtnutrition
-cd dtnutrition/nextjs_space
+git clone https://seu-repo.git nutrition
+cd nutrition/nextjs_space
 ```
 
 ### 2. Configurar Variáveis de Ambiente
@@ -112,13 +112,13 @@ pm2 save
 
 ```bash
 # Copiar configuração
-sudo cp nginx.conf.example /etc/nginx/sites-available/dtnutrition
+sudo cp nginx.conf.example /etc/nginx/sites-available/nutrition
 
 # Editar domínio
-sudo nano /etc/nginx/sites-available/dtnutrition
+sudo nano /etc/nginx/sites-available/nutrition
 
 # Habilitar site
-sudo ln -s /etc/nginx/sites-available/dtnutrition /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/nutrition /etc/nginx/sites-enabled/
 
 # Remover default (opcional)
 sudo rm /etc/nginx/sites-enabled/default
@@ -148,19 +148,19 @@ sudo certbot renew --dry-run
 pm2 status
 
 # Ver logs em tempo real
-pm2 logs dtnutrition
+pm2 logs nutrition
 
 # Ver logs de erro
-pm2 logs dtnutrition --err
+pm2 logs nutrition --err
 
 # Reiniciar aplicação
-pm2 restart dtnutrition
+pm2 restart nutrition
 
 # Parar aplicação
-pm2 stop dtnutrition
+pm2 stop nutrition
 
 # Deletar do PM2
-pm2 delete dtnutrition
+pm2 delete nutrition
 
 # Monitoramento em tempo real
 pm2 monit
@@ -169,7 +169,7 @@ pm2 monit
 ## 🔄 Atualizando a Aplicação
 
 ```bash
-cd /home/ubuntu/workspace/dtnutrition/nextjs_space
+cd /home/ubuntu/workspace/nutrition/nextjs_space
 
 # Baixar atualizações
 git pull origin main
@@ -181,7 +181,7 @@ git pull origin main
 ./deploy.sh --skip-deps
 
 # Reiniciar PM2
-pm2 restart dtnutrition
+pm2 restart nutrition
 ```
 
 ## 🐛 Troubleshooting
@@ -190,7 +190,7 @@ pm2 restart dtnutrition
 
 ```bash
 # Ver logs detalhados
-pm2 logs dtnutrition --lines 100
+pm2 logs nutrition --lines 100
 
 # Verificar se a porta está livre
 sudo lsof -i :3006
@@ -203,7 +203,7 @@ cat .env.production
 
 ```bash
 # Testar conexão
-psql "postgresql://dtnutrition_user:SENHA@localhost:5432/dtnutrition_prod"
+psql "postgresql://nutrition_user:SENHA@localhost:5432/nutrition_prod"
 
 # Verificar se PostgreSQL está rodando
 sudo systemctl status postgresql
@@ -216,7 +216,7 @@ sudo systemctl status postgresql
 pm2 status
 
 # Verificar logs do Nginx
-sudo tail -f /var/log/nginx/dtnutrition_error.log
+sudo tail -f /var/log/nginx/nutrition_error.log
 
 # Verificar se a porta está correta
 curl http://127.0.0.1:3006
@@ -226,8 +226,8 @@ curl http://127.0.0.1:3006
 
 ```bash
 # Corrigir permissões se necessário
-sudo chown -R ubuntu:ubuntu /home/ubuntu/workspace/dtnutrition
-chmod -R 755 /home/ubuntu/workspace/dtnutrition
+sudo chown -R ubuntu:ubuntu /home/ubuntu/workspace/nutrition
+chmod -R 755 /home/ubuntu/workspace/nutrition
 ```
 
 ## 📈 Monitoramento
@@ -249,6 +249,6 @@ curl https://seu-dominio.com.br/api/health
 ## 📞 Suporte
 
 Se encontrar problemas:
-1. Verifique os logs: `pm2 logs dtnutrition`
+1. Verifique os logs: `pm2 logs nutrition`
 2. Verifique o status: `pm2 status`
 3. Consulte este guia de troubleshooting

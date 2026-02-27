@@ -45,7 +45,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <Image
                 src="/logo.png"
-                alt="Digital Twin Logo"
+                alt="Nutrition Logo"
                 width={140}
                 height={56}
                 className="object-contain"
@@ -63,10 +63,10 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Bem-vindo ao Digital Twin
+            Bem-vindo ao Nutrition
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Sistema de visualização 3D e acompanhamento clínico de pacientes.
+            Sistema de nutrição, visualização 3D e acompanhamento clínico de pacientes.
             Selecione seu perfil para acessar o sistema.
           </p>
         </div>

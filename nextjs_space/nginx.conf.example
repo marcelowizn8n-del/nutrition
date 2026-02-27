@@ -1,20 +1,20 @@
 # ===========================================
-# DTNutrition - Configuração Nginx
+# Nutrition - Configuração Nginx
 # ===========================================
 # 
 # Instruções:
-# 1. Copie este arquivo para /etc/nginx/sites-available/dtnutrition
-# 2. Crie symlink: ln -s /etc/nginx/sites-available/dtnutrition /etc/nginx/sites-enabled/
+# 1. Copie este arquivo para /etc/nginx/sites-available/nutrition
+# 2. Crie symlink: ln -s /etc/nginx/sites-available/nutrition /etc/nginx/sites-enabled/
 # 3. Teste configuração: nginx -t
 # 4. Reinicie nginx: systemctl reload nginx
 #
 # SSL: Você pode configurar SSL usando Certbot:
 #   sudo apt install certbot python3-certbot-nginx
-#   sudo certbot --nginx -d seu-dominio.com.br
+#   sudo certbot --nginx -d nutrition.thinkingtools.site
 #
 
 # Upstream para a aplicação Next.js
-upstream dtnutrition_app {
+upstream nutrition_app {
     server 127.0.0.1:3006;
     keepalive 64;
 }
@@ -23,7 +23,7 @@ upstream dtnutrition_app {
 # server {
 #     listen 80;
 #     listen [::]:80;
-#     server_name seu-dominio.com.br;
+#     server_name nutrition.thinkingtools.site;
 #     return 301 https://$server_name$request_uri;
 # }
 
@@ -37,17 +37,17 @@ server {
     # listen 443 ssl http2;
     # listen [::]:443 ssl http2;
     
-    server_name seu-dominio.com.br;
+    server_name nutrition.thinkingtools.site;
     
     # SSL - Certbot vai preencher automaticamente
-    # ssl_certificate /etc/letsencrypt/live/seu-dominio.com.br/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/seu-dominio.com.br/privkey.pem;
+    # ssl_certificate /etc/letsencrypt/live/nutrition.thinkingtools.site/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/nutrition.thinkingtools.site/privkey.pem;
     # include /etc/letsencrypt/options-ssl-nginx.conf;
     # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
     
     # Logs
-    access_log /var/log/nginx/dtnutrition_access.log;
-    error_log /var/log/nginx/dtnutrition_error.log;
+    access_log /var/log/nginx/nutrition_access.log;
+    error_log /var/log/nginx/nutrition_error.log;
     
     # Tamanho máximo de upload (para imagens de receitas, etc.)
     client_max_body_size 10M;
@@ -67,35 +67,35 @@ server {
     
     # Cache para arquivos estáticos do Next.js
     location /_next/static/ {
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
         proxy_cache_valid 200 365d;
         add_header Cache-Control "public, max-age=31536000, immutable";
     }
     
     # Cache para arquivos públicos
     location /static/ {
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
         proxy_cache_valid 200 7d;
         add_header Cache-Control "public, max-age=604800";
     }
     
     # Modelos 3D (GLB/GLTF) - cache longo
     location ~* \.(glb|gltf)$ {
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
         proxy_cache_valid 200 30d;
         add_header Cache-Control "public, max-age=2592000";
     }
     
     # Imagens - cache médio
     location ~* \.(jpg|jpeg|png|gif|ico|svg|webp)$ {
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
         proxy_cache_valid 200 7d;
         add_header Cache-Control "public, max-age=604800";
     }
     
     # Proxy principal para Next.js
     location / {
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
         proxy_http_version 1.1;
         
         # Headers para proxy
@@ -125,6 +125,6 @@ server {
     # Health check endpoint (opcional)
     location /health {
         access_log off;
-        proxy_pass http://dtnutrition_app;
+        proxy_pass http://nutrition_app;
     }
 }

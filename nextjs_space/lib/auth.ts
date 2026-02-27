@@ -7,7 +7,7 @@ export type AuthPayload = {
   role: AuthRole;
 };
 
-export const AUTH_COOKIE_NAME = 'dtnutrition_session';
+export const AUTH_COOKIE_NAME = 'nutrition_session';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;

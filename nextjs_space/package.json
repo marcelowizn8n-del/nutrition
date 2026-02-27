@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "nutrition",
   "private": true,
   "scripts": {
     "dev": "next dev",
