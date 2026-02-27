@@ -136,6 +136,7 @@ model Patient {
   alerts      Alert[]
   progress    ProgressLog[]
   simulations BodySimulation[]
+  mealPlans   MealPlan[]
 
   @@index([organizationId, createdAt])
 }
@@ -360,4 +361,91 @@ model RecipeSuggestion {
 
   @@index([planId, createdAt])
   @@index([region, mealType])
+}
+
+// ========== Nutrition Phase 2 Models ==========
+
+enum RecipeCategory {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+enum MealPlanStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model Recipe {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  ingredients Json           // Array of ingredients with quantities
+  instructions String        // Step-by-step preparation
+  nutritionalInfo Json       // calories, proteins, carbs, fats, fiber
+  category    RecipeCategory
+  prepTime    Int            // in minutes
+  servings    Int
+  imageUrl    String?
+  createdById String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  mealPlanRecipes   MealPlanRecipe[]
+  originalFor       RecipeSubstitution[] @relation("OriginalRecipe")
+  substituteFor     RecipeSubstitution[] @relation("SubstituteRecipe")
+
+  @@index([category])
+  @@index([createdById])
+}
+
+model MealPlan {
+  id              String         @id @default(cuid())
+  patientId       String
+  nutritionistId  String?
+  startDate       DateTime
+  endDate         DateTime
+  notes           String?
+  status          MealPlanStatus @default(DRAFT)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  recipes MealPlanRecipe[]
+
+  @@index([patientId, status])
+  @@index([nutritionistId])
+}
+
+model MealPlanRecipe {
+  id         String   @id @default(cuid())
+  mealPlanId String
+  recipeId   String
+  dayOfWeek  Int      // 0-6 (Sunday-Saturday)
+  mealType   MealType
+  portion    Float    @default(1.0)
+  notes      String?
+  substitutedFromId String? // Original recipe if this is a substitution
+
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe   Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([mealPlanId, dayOfWeek])
+  @@index([recipeId])
+}
+
+model RecipeSubstitution {
+  id               String  @id @default(cuid())
+  originalRecipeId String
+  substituteRecipeId String
+  reason           String?
+
+  originalRecipe   Recipe @relation("OriginalRecipe", fields: [originalRecipeId], references: [id], onDelete: Cascade)
+  substituteRecipe Recipe @relation("SubstituteRecipe", fields: [substituteRecipeId], references: [id], onDelete: Cascade)
+
+  @@unique([originalRecipeId, substituteRecipeId])
+  @@index([originalRecipeId])
 }
