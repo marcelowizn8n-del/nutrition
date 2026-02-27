@@ -1,20 +1,130 @@
-server {
-    server_name digitaltwin.dttools.app;
+# ===========================================
+# DTNutrition - Configuração Nginx
+# ===========================================
+# 
+# Instruções:
+# 1. Copie este arquivo para /etc/nginx/sites-available/dtnutrition
+# 2. Crie symlink: ln -s /etc/nginx/sites-available/dtnutrition /etc/nginx/sites-enabled/
+# 3. Teste configuração: nginx -t
+# 4. Reinicie nginx: systemctl reload nginx
+#
+# SSL: Você pode configurar SSL usando Certbot:
+#   sudo apt install certbot python3-certbot-nginx
+#   sudo certbot --nginx -d seu-dominio.com.br
+#
 
+# Upstream para a aplicação Next.js
+upstream dtnutrition_app {
+    server 127.0.0.1:3006;
+    keepalive 64;
+}
+
+# Redirecionar HTTP para HTTPS (descomente após configurar SSL)
+# server {
+#     listen 80;
+#     listen [::]:80;
+#     server_name seu-dominio.com.br;
+#     return 301 https://$server_name$request_uri;
+# }
+
+# Servidor principal
+server {
+    # Para HTTP (sem SSL inicialmente)
+    listen 80;
+    listen [::]:80;
+    
+    # Para HTTPS (descomente após configurar SSL)
+    # listen 443 ssl http2;
+    # listen [::]:443 ssl http2;
+    
+    server_name seu-dominio.com.br;
+    
+    # SSL - Certbot vai preencher automaticamente
+    # ssl_certificate /etc/letsencrypt/live/seu-dominio.com.br/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/seu-dominio.com.br/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    
+    # Logs
+    access_log /var/log/nginx/dtnutrition_access.log;
+    error_log /var/log/nginx/dtnutrition_error.log;
+    
+    # Tamanho máximo de upload (para imagens de receitas, etc.)
+    client_max_body_size 10M;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml application/json application/javascript application/rss+xml application/atom+xml image/svg+xml;
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    
+    # Cache para arquivos estáticos do Next.js
+    location /_next/static/ {
+        proxy_pass http://dtnutrition_app;
+        proxy_cache_valid 200 365d;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+    
+    # Cache para arquivos públicos
+    location /static/ {
+        proxy_pass http://dtnutrition_app;
+        proxy_cache_valid 200 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+    
+    # Modelos 3D (GLB/GLTF) - cache longo
+    location ~* \.(glb|gltf)$ {
+        proxy_pass http://dtnutrition_app;
+        proxy_cache_valid 200 30d;
+        add_header Cache-Control "public, max-age=2592000";
+    }
+    
+    # Imagens - cache médio
+    location ~* \.(jpg|jpeg|png|gif|ico|svg|webp)$ {
+        proxy_pass http://dtnutrition_app;
+        proxy_cache_valid 200 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+    
+    # Proxy principal para Next.js
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://dtnutrition_app;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         
-        # Real IP forwarding
+        # Headers para proxy
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        # WebSocket support (se necessário para hot reload em dev)
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        # Buffer settings
+        proxy_buffering on;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
     }
-
-    # Optional: Increase upload limit if needed
-    client_max_body_size 10M;
+    
+    # Health check endpoint (opcional)
+    location /health {
+        access_log off;
+        proxy_pass http://dtnutrition_app;
+    }
 }
