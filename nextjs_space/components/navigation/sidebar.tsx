@@ -2,21 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
   LayoutDashboard,
   Users,
   Utensils,
   Calendar,
-  Settings,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  User,
   Stethoscope,
   Heart,
   Apple,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -64,8 +63,23 @@ const roleLabels: Record<string, string> = {
 
 export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '' }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const navItems = navItemsByRole[userRole] || [];
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/entrar');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoggingOut(false);
+    }
+  }
 
   return (
     <aside
@@ -79,13 +93,22 @@ export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '
         <div className="flex items-center justify-between p-4 border-b">
           {!collapsed && (
             <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo.png"
-                alt="Digital Twin"
-                width={120}
-                height={40}
-                className="object-contain"
-              />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5"
+                >
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+              </div>
+              <span className="font-semibold text-gray-900">Nutrition</span>
             </Link>
           )}
           <Button
@@ -142,16 +165,21 @@ export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '
 
         {/* Footer */}
         <div className="p-2 border-t">
-          <Link
-            href="/api/auth/logout"
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
             className={cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors',
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors',
               collapsed && 'justify-center'
             )}
           >
-            <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Sair</span>}
-          </Link>
+            {loggingOut ? (
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
+            ) : (
+              <LogOut className="h-5 w-5 shrink-0" />
+            )}
+            {!collapsed && <span>{loggingOut ? 'Saindo...' : 'Sair'}</span>}
+          </button>
         </div>
       </div>
     </aside>

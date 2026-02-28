@@ -1,11 +1,19 @@
 import { DashboardLayout } from '@/components/layout';
+import { getServerSession } from '@/lib/auth-server';
+import { redirect } from 'next/navigation';
 
-export default function MedicoLayout({ children }: { children: React.ReactNode }) {
+export default async function MedicoLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession();
+  
+  if (!session) {
+    redirect('/entrar?redirect=/medico');
+  }
+
   return (
     <DashboardLayout
       userRole="medico"
-      userName="Dr. Carlos"
-      userEmail="carlos@thinkingtools.health"
+      userName={session.user.name}
+      userEmail={session.user.email}
     >
       {children}
     </DashboardLayout>
