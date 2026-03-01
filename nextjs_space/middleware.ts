@@ -10,6 +10,11 @@ const PUBLIC_ROUTES = [
   '/api/auth/logout',
 ];
 
+// Routes that require authentication but are accessible by all roles
+const AUTHENTICATED_ROUTES = [
+  '/perfil',
+];
+
 const ROLE_ROUTES: Record<string, AuthRole[]> = {
   '/admin': ['ADMIN'],
   '/nutricionista': ['ADMIN', 'NUTRITIONIST'],
@@ -51,6 +56,15 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL('/entrar', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Allow authenticated routes for all logged-in users
+  const isAuthenticatedRoute = AUTHENTICATED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + '/')
+  );
+  
+  if (isAuthenticatedRoute) {
+    return NextResponse.next();
   }
 
   // Check role-based access

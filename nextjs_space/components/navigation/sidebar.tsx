@@ -19,6 +19,7 @@ import {
   Shield,
   Settings,
   UserCog,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -175,7 +176,18 @@ export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '
         </nav>
 
         {/* Footer */}
-        <div className="p-2 border-t">
+        <div className="p-2 border-t space-y-1">
+          <Link
+            href="/perfil"
+            className={cn(
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors',
+              collapsed && 'justify-center',
+              pathname === '/perfil' && 'bg-blue-100 text-blue-700'
+            )}
+          >
+            <UserCircle className="h-5 w-5 shrink-0" />
+            {!collapsed && <span>Meu Perfil</span>}
+          </Link>
           <button
             onClick={handleLogout}
             disabled={loggingOut}

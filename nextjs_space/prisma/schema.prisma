@@ -107,6 +107,8 @@ model User {
   email        String   @unique
   role         UserRole
   passwordHash String
+  avatarUrl    String?
+  phone        String?
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
