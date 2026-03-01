@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AvatarUpload } from '@/components/avatar-upload';
 import { ArrowLeft, Loader2, UserCog } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -24,6 +25,7 @@ export default function EditarUsuarioPage() {
     name: '',
     email: '',
     role: '' as string,
+    avatarUrl: '',
     newPassword: '',
     confirmPassword: '',
   });
@@ -41,6 +43,7 @@ export default function EditarUsuarioPage() {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatarUrl: user.avatarUrl || '',
           newPassword: '',
           confirmPassword: '',
         });
@@ -76,6 +79,7 @@ export default function EditarUsuarioPage() {
         name: formData.name,
         email: formData.email,
         role: formData.role,
+        avatarUrl: formData.avatarUrl,
       };
 
       if (resetPassword && formData.newPassword) {
@@ -137,6 +141,14 @@ export default function EditarUsuarioPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex justify-center pb-4">
+              <AvatarUpload
+                currentUrl={formData.avatarUrl}
+                onUpload={(url) => setFormData({ ...formData, avatarUrl: url })}
+                size="lg"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Nome Completo</Label>
               <Input

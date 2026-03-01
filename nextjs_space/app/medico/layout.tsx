@@ -14,6 +14,7 @@ export default async function MedicoLayout({ children }: { children: React.React
       userRole="medico"
       userName={session.user.name}
       userEmail={session.user.email}
+      userAvatar={session.user.avatarUrl || ''}
     >
       {children}
     </DashboardLayout>

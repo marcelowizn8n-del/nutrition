@@ -8,6 +8,7 @@ export async function getServerSession(): Promise<{
     name: string;
     email: string;
     role: 'ADMIN' | 'NUTRITIONIST' | 'PATIENT';
+    avatarUrl: string | null;
   };
 } | null> {
   try {
@@ -26,6 +27,7 @@ export async function getServerSession(): Promise<{
         name: true,
         email: true,
         role: true,
+        avatarUrl: true,
       },
     });
 

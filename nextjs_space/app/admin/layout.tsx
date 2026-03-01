@@ -22,6 +22,7 @@ export default async function AdminLayout({
       userRole="admin"
       userName={session.user.name}
       userEmail={session.user.email}
+      userAvatar={session.user.avatarUrl || ''}
     >
       {children}
     </DashboardLayout>

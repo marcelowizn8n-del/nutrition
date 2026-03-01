@@ -10,6 +10,7 @@ interface DashboardLayoutProps {
   userRole: 'medico' | 'nutricionista' | 'paciente' | 'admin';
   userName?: string;
   userEmail?: string;
+  userAvatar?: string;
 }
 
 export default function DashboardLayout({
@@ -17,13 +18,14 @@ export default function DashboardLayout({
   userRole,
   userName,
   userEmail,
+  userAvatar,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <Sidebar userRole={userRole} userName={userName} userEmail={userEmail} />
+      <Sidebar userRole={userRole} userName={userName} userEmail={userEmail} userAvatar={userAvatar} />
 
       {/* Main Content */}
       <div className="lg:pl-64 pl-16 transition-all duration-300">

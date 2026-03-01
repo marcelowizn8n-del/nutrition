@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, password, role } = body;
+    const { name, email, password, role, avatarUrl } = body;
 
     // Validate required fields
     if (!name || !email || !password || !role) {
@@ -83,12 +83,14 @@ export async function POST(request: NextRequest) {
         email: email.toLowerCase().trim(),
         passwordHash,
         role,
+        avatarUrl: avatarUrl || null,
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        avatarUrl: true,
         createdAt: true,
       },
     });

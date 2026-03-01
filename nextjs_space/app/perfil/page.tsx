@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, ArrowLeft, User, Mail, Shield, Camera, Save } from 'lucide-react';
+import { AvatarUpload } from '@/components/avatar-upload';
+import { Loader2, ArrowLeft, User, Mail, Shield, Save } from 'lucide-react';
 import Link from 'next/link';
 
 const roleLabels: Record<string, string> = {
@@ -159,12 +159,11 @@ export default function PerfilPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={formData.avatarUrl} />
-              <AvatarFallback className="text-2xl bg-blue-100 text-blue-700">
-                {user?.name?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarUpload
+              currentUrl={formData.avatarUrl}
+              onUpload={(url) => setFormData({ ...formData, avatarUrl: url })}
+              size="lg"
+            />
             <div className="flex-1">
               <h3 className="text-lg font-medium">{user?.name}</h3>
               <p className="text-sm text-gray-500">{user?.email}</p>
@@ -209,21 +208,7 @@ export default function PerfilPage() {
               <p className="text-xs text-gray-500">O email não pode ser alterado</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="avatarUrl">URL do Avatar</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="avatarUrl"
-                  value={formData.avatarUrl}
-                  onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-                  placeholder="https://upload.wikimedia.org/wikipedia/commons/6/67/User_Avatar.png"
-                />
-                <Button type="button" variant="outline" size="icon">
-                  <Camera className="w-4 h-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">Cole a URL de uma imagem para seu avatar</p>
-            </div>
+
           </CardContent>
         </Card>
 

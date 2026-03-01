@@ -36,6 +36,7 @@ interface SidebarProps {
   userRole: 'medico' | 'nutricionista' | 'paciente' | 'admin';
   userName?: string;
   userEmail?: string;
+  userAvatar?: string;
 }
 
 const navItemsByRole: Record<string, NavItem[]> = {
@@ -73,7 +74,7 @@ const roleLabels: Record<string, string> = {
   paciente: 'Paciente',
 };
 
-export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '' }: SidebarProps) {
+export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '', userAvatar = '' }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const pathname = usePathname();
@@ -137,7 +138,7 @@ export default function Sidebar({ userRole, userName = 'Usuário', userEmail = '
         <div className={cn('p-4 border-b', collapsed && 'px-2')}>
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
-              <AvatarImage src="" />
+              <AvatarImage src={userAvatar} />
               <AvatarFallback className="bg-blue-100 text-blue-700">
                 {userName.charAt(0).toUpperCase()}
               </AvatarFallback>

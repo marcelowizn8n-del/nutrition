@@ -14,6 +14,7 @@ export default async function PacienteLayout({ children }: { children: React.Rea
       userRole="paciente"
       userName={session.user.name}
       userEmail={session.user.email}
+      userAvatar={session.user.avatarUrl || ''}
     >
       {children}
     </DashboardLayout>

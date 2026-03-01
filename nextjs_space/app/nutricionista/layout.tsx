@@ -14,6 +14,7 @@ export default async function NutricionistaLayout({ children }: { children: Reac
       userRole="nutricionista"
       userName={session.user.name}
       userEmail={session.user.email}
+      userAvatar={session.user.avatarUrl || ''}
     >
       {children}
     </DashboardLayout>

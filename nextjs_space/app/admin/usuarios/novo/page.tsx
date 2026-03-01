@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AvatarUpload } from '@/components/avatar-upload';
 import { ArrowLeft, Loader2, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -20,6 +21,7 @@ export default function NovoUsuarioPage() {
     password: '',
     confirmPassword: '',
     role: '' as string,
+    avatarUrl: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,6 +54,7 @@ export default function NovoUsuarioPage() {
           email: formData.email,
           password: formData.password,
           role: formData.role,
+          avatarUrl: formData.avatarUrl,
         }),
       });
 
@@ -96,6 +99,14 @@ export default function NovoUsuarioPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex justify-center pb-4">
+              <AvatarUpload
+                currentUrl={formData.avatarUrl}
+                onUpload={(url) => setFormData({ ...formData, avatarUrl: url })}
+                size="lg"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Nome Completo</Label>
               <Input
