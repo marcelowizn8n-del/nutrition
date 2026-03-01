@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Loader2, TrendingDown, TrendingUp, Sparkles, Activity, Pill, Scale, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, TrendingDown, TrendingUp, Sparkles, Activity, Pill, Scale, ArrowRight, AlertCircle, CheckCircle2, Plus, Minus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SimulationResult {
@@ -141,16 +141,62 @@ export default function WhatIfSimulator({
         {/* Intervenções */}
         <div className="space-y-4">
           {/* Perda de Peso */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label className="flex items-center gap-2">
                 <Scale className="h-4 w-4 text-orange-500" />
-                Perda de Peso
+                Ajuste de Peso
               </Label>
               <Badge variant="outline" className="font-mono">
                 {weightLoss > 0 ? `-${weightLoss} kg` : '0 kg'}
               </Badge>
             </div>
+            
+            {/* Quick adjust buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWeightLoss(Math.max(0, weightLoss - 5))}
+                disabled={weightLoss <= 0}
+                className="h-8 px-2"
+              >
+                <Minus className="h-3 w-3 mr-1" />5kg
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWeightLoss(Math.max(0, weightLoss - 1))}
+                disabled={weightLoss <= 0}
+                className="h-8 px-2"
+              >
+                <Minus className="h-3 w-3 mr-1" />1kg
+              </Button>
+              <div className="flex-1 text-center">
+                <span className="text-lg font-bold text-orange-600">
+                  {currentWeight - weightLoss} kg
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWeightLoss(Math.min(maxWeightLoss, weightLoss + 1))}
+                disabled={weightLoss >= maxWeightLoss}
+                className="h-8 px-2"
+              >
+                <Plus className="h-3 w-3 mr-1" />1kg
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setWeightLoss(Math.min(maxWeightLoss, weightLoss + 5))}
+                disabled={weightLoss >= maxWeightLoss}
+                className="h-8 px-2"
+              >
+                <Plus className="h-3 w-3 mr-1" />5kg
+              </Button>
+            </div>
+            
             <Slider
               value={[weightLoss]}
               onValueChange={([v]) => setWeightLoss(v)}
@@ -158,9 +204,10 @@ export default function WhatIfSimulator({
               step={1}
               className="[&_[role=slider]]:bg-orange-500"
             />
-            <p className="text-xs text-muted-foreground">
-              Peso atual: {currentWeight}kg → Peso projetado: {currentWeight - weightLoss}kg
-            </p>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Peso atual: {currentWeight}kg</span>
+              <span>Perda máxima: {maxWeightLoss}kg</span>
+            </div>
           </div>
           
           {/* Atividade Física */}

@@ -11,6 +11,7 @@ const PUBLIC_ROUTES = [
 ];
 
 const ROLE_ROUTES: Record<string, AuthRole[]> = {
+  '/admin': ['ADMIN'],
   '/nutricionista': ['ADMIN', 'NUTRITIONIST'],
   '/medico': ['ADMIN', 'NUTRITIONIST'],
   '/paciente': ['ADMIN', 'NUTRITIONIST', 'PATIENT'],
@@ -58,7 +59,7 @@ export async function middleware(request: NextRequest) {
       if (!allowedRoles.includes(payload.role)) {
         // Redirect to appropriate area based on role
         const redirectMap: Record<AuthRole, string> = {
-          ADMIN: '/nutricionista',
+          ADMIN: '/admin',
           NUTRITIONIST: '/nutricionista',
           PATIENT: '/paciente',
         };

@@ -20,7 +20,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Calendar, User, Loader2, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Calendar, User, Loader2, Eye, Edit, Trash2, Search, ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { 
   getMealPlans, 
   deleteMealPlan,
@@ -38,7 +39,18 @@ export default function MealPlansPage() {
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingPlan, setDeletingPlan] = useState<MealPlan | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
+
+  // Filter meal plans based on search term
+  const filteredMealPlans = mealPlans.filter(plan => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      (plan.patient?.name || '').toLowerCase().includes(term) ||
+      (plan.notes || '').toLowerCase().includes(term)
+    );
+  });
 
   useEffect(() => {
     loadMealPlans();
@@ -92,17 +104,35 @@ export default function MealPlansPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Link href="/nutricionista">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+              </Button>
+            </Link>
+          </div>
           <h1 className="text-2xl font-bold">Cardápios</h1>
           <p className="text-muted-foreground">Gerencie os cardápios dos pacientes</p>
         </div>
-        <Link href="/nutricionista/cardapios/novo">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Cardápio
-          </Button>
-        </Link>
+        <div className="flex gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar cardápio..."
+              className="pl-10 w-64"
+            />
+          </div>
+          <Link href="/nutricionista/cardapios/novo">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Cardápio
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Meal Plans List */}
@@ -110,7 +140,7 @@ export default function MealPlansPage() {
         <div className="flex justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-      ) : mealPlans.length === 0 ? (
+      ) : filteredMealPlans.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
             <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -125,7 +155,7 @@ export default function MealPlansPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {mealPlans.map(plan => {
+          {filteredMealPlans.map(plan => {
             const statusInfo = getStatusInfo(plan.status);
             return (
               <Card key={plan.id} className="hover:shadow-md transition-shadow">

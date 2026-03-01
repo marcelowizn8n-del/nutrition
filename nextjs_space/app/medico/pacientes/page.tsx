@@ -17,11 +17,12 @@ import {
 } from '@/components/patient';
 import { ClinicalToBodyMapper } from '@/lib/clinical-mapper';
 import { defaultMorphTargets, diseaseNames, MorphTargets } from '@/lib/types';
-import { Loader2, AlertCircle, Activity, ArrowLeft } from 'lucide-react';
+import { Loader2, AlertCircle, Activity, ArrowLeft, Plus, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 
 export default function MedicoPacientesPage() {
@@ -32,8 +33,19 @@ export default function MedicoPacientesPage() {
   const [simulatedWeight, setSimulatedWeight] = useState(0);
   const [simulatedAbdomen, setSimulatedAbdomen] = useState(0);
   const [simulatedActivityLevel, setSimulatedActivityLevel] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { patients, selectedPatient, selectedPatientId, setSelectedPatientId, loading, error } = usePatientData();
+  
+  // Filter patients based on search term
+  const filteredPatients = useMemo(() => {
+    if (!searchTerm.trim()) return patients;
+    const term = searchTerm.toLowerCase();
+    return patients.filter(p => 
+      p.name.toLowerCase().includes(term) ||
+      (p.email && p.email.toLowerCase().includes(term))
+    );
+  }, [patients, searchTerm]);
   const { minYear, maxYear, currentRecordData, changeFromBaseline } = useClinicalMetrics(selectedPatient, currentYear);
 
   useEffect(() => {
@@ -117,7 +129,7 @@ export default function MedicoPacientesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Button variant="ghost" size="sm" asChild>
@@ -129,6 +141,22 @@ export default function MedicoPacientesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Pacientes</h1>
           <p className="text-gray-500">Visualize e analise os dados de seus pacientes</p>
         </div>
+        <div className="flex gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar paciente..."
+              className="pl-10 w-64"
+            />
+          </div>
+          <Button asChild>
+            <Link href="/medico/pacientes/novo">
+              <Plus className="w-4 h-4 mr-2" /> Adicionar
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Patient Selector */}
@@ -136,7 +164,7 @@ export default function MedicoPacientesPage() {
         <CardContent className="py-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <PatientSelector
-              patients={patients}
+              patients={filteredPatients}
               selectedPatientId={selectedPatientId}
               onSelectPatient={setSelectedPatientId}
             />

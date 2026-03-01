@@ -16,6 +16,9 @@ import {
   Heart,
   Apple,
   Loader2,
+  Shield,
+  Settings,
+  UserCog,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -29,12 +32,19 @@ interface NavItem {
 }
 
 interface SidebarProps {
-  userRole: 'medico' | 'nutricionista' | 'paciente';
+  userRole: 'medico' | 'nutricionista' | 'paciente' | 'admin';
   userName?: string;
   userEmail?: string;
 }
 
 const navItemsByRole: Record<string, NavItem[]> = {
+  admin: [
+    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/usuarios', label: 'Usuários', icon: UserCog },
+    { href: '/nutricionista/pacientes', label: 'Pacientes', icon: Users },
+    { href: '/nutricionista/cardapios', label: 'Cardápios', icon: Utensils },
+    { href: '/medico/analise', label: 'Análise Clínica', icon: Stethoscope },
+  ],
   medico: [
     { href: '/medico', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/medico/pacientes', label: 'Pacientes', icon: Users },
@@ -56,6 +66,7 @@ const navItemsByRole: Record<string, NavItem[]> = {
 };
 
 const roleLabels: Record<string, string> = {
+  admin: 'Administrador',
   medico: 'Médico',
   nutricionista: 'Nutricionista',
   paciente: 'Paciente',

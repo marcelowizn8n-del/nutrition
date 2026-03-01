@@ -1,8 +1,10 @@
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { ClinicalToBodyMapper, MorphTargets } from '@/lib/clinical-mapper';
+import { verifyAuthToken, AUTH_COOKIE_NAME } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 interface ClinicalRecord {
   id: string;
@@ -119,6 +121,82 @@ export async function GET() {
         error: error instanceof Error ? error.message : 'Unknown error',
         details: JSON.stringify(error, Object.getOwnPropertyNames(error))
       },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/patients - Create a new patient
+export async function POST(request: NextRequest) {
+  try {
+    // Verify authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
+    const payload = await verifyAuthToken(token);
+    
+    if (!payload) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { name, email, sex, birthDate, phone, cpf, height, weight, muscleMass, bodyFat, waterPercentage, visceralFat, waistCircumference } = body;
+
+    // Validate required fields
+    if (!name || !sex || !birthDate || !height || !weight) {
+      return NextResponse.json({ error: 'Campos obrigatórios: nome, sexo, data de nascimento, altura e peso' }, { status: 400 });
+    }
+
+    const birthYear = new Date(birthDate).getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    // Get default organization
+    let organization = await prisma.organization.findFirst({
+      where: { slug: 'demo' }
+    });
+
+    if (!organization) {
+      organization = await prisma.organization.create({
+        data: {
+          name: 'Demo Organization',
+          slug: 'demo'
+        }
+      });
+    }
+
+    // Create patient
+    const patient = await prisma.patient.create({
+      data: {
+        name,
+        sex,
+        birthYear,
+        birthDate: new Date(birthDate),
+        organizationId: organization.id,
+        records: {
+          create: {
+            year: currentYear,
+            visitDate: new Date(),
+            heightCm: parseFloat(height),
+            weightKg: parseFloat(weight),
+            diseaseCodes: '[]',
+            waistCm: waistCircumference ? parseFloat(waistCircumference) : null,
+            bioImpedanceFat: bodyFat ? parseFloat(bodyFat) : null,
+            bioImpedanceMuscle: muscleMass ? parseFloat(muscleMass) : null,
+            bioImpedanceWater: waterPercentage ? parseFloat(waterPercentage) : null,
+            bioImpedanceVisceral: visceralFat ? parseFloat(visceralFat) : null,
+            bmi: parseFloat(weight) / Math.pow(parseFloat(height) / 100, 2),
+          }
+        }
+      },
+      include: {
+        records: true
+      }
+    });
+
+    return NextResponse.json({ success: true, patient }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating patient:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Erro ao criar paciente' },
       { status: 500 }
     );
   }

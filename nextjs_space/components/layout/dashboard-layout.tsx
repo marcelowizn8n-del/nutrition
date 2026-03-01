@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  userRole: 'medico' | 'nutricionista' | 'paciente';
+  userRole: 'medico' | 'nutricionista' | 'paciente' | 'admin';
   userName?: string;
   userEmail?: string;
 }
